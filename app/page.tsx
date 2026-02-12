@@ -58,115 +58,184 @@ function formatDate(iso: string): string {
 async function generatePdf(result: ScanResult) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
+  const pw = doc.internal.pageSize.getWidth();
+  const margin = 16;
+  const contentW = pw - margin * 2;
   let y = 20;
 
   const checkPage = (needed: number) => {
-    if (y + needed > 270) {
+    if (y + needed > 272) {
       doc.addPage();
       y = 20;
     }
   };
 
-  doc.setFontSize(22);
+  // === EN-TETE avec bande bleue ===
+  doc.setFillColor(37, 99, 235);
+  doc.rect(0, 0, pw, 40, "F");
+
+  doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text("Rapport AccessScan", pageWidth / 2, y, { align: "center" });
-  y += 10;
+  doc.setTextColor(255, 255, 255);
+  doc.text("AccessScan", margin, 18);
 
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(100);
-  doc.text("Audit d'accessibilite web — Outil d'aide a la demarche", pageWidth / 2, y, { align: "center" });
-  y += 6;
-  doc.text("Ce rapport ne constitue pas une certification WCAG/RGAA", pageWidth / 2, y, { align: "center" });
-  y += 12;
-
-  doc.setTextColor(0);
   doc.setFontSize(11);
-  const urlDisplay = result.url.length > 70 ? result.url.substring(0, 70) + "..." : result.url;
-  doc.text("URL analysee : " + urlDisplay, 14, y);
-  y += 6;
-  doc.text("Date : " + formatDate(result.timestamp), 14, y);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(200, 220, 255);
+  doc.text("Rapport d'audit d'accessibilite web", margin, 27);
+
+  doc.setFontSize(8);
+  doc.text("Outil d'aide a la demarche — Ne constitue pas une certification WCAG/RGAA", margin, 35);
+
+  y = 52;
+
+  // === INFOS ===
+  doc.setTextColor(100);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  const urlDisplay = result.url.length > 80 ? result.url.substring(0, 80) + "..." : result.url;
+  doc.text("URL :  " + urlDisplay, margin, y);
+  y += 5;
+  doc.text("Date :  " + formatDate(result.timestamp), margin, y);
   y += 10;
 
-  doc.setFontSize(16);
+  // === BLOC SCORE avec fond gris ===
+  const scoreBoxH = 32;
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(margin, y, contentW, scoreBoxH, 3, 3, "FD");
+
+  const scoreColor: [number, number, number] = result.score >= 80 ? [22, 163, 74] : result.score >= 50 ? [234, 88, 12] : [220, 38, 38];
+
+  doc.setFontSize(28);
   doc.setFont("helvetica", "bold");
-  const sc: [number, number, number] = result.score >= 80 ? [22, 163, 74] : result.score >= 50 ? [234, 88, 12] : [220, 38, 38];
-  doc.setTextColor(sc[0], sc[1], sc[2]);
-  doc.text("Score : " + result.score + "/100 — " + getScoreLabel(result.score), 14, y);
-  y += 8;
+  doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+  doc.text(result.score + "/100", margin + 10, y + 14);
 
-  doc.setTextColor(0);
-  doc.setFontSize(10);
-  doc.text(
-    result.summary.critical + " critique(s) | " + result.summary.major + " majeur(s) | " + result.summary.minor + " mineur(s)",
-    14,
-    y
-  );
-  y += 10;
+  doc.setFontSize(14);
+  doc.text(getScoreLabel(result.score), margin + 10, y + 24);
 
-  doc.setDrawColor(200);
-  doc.line(14, y, pageWidth - 14, y);
+  // Compteurs a droite
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  const rx = pw - margin - 10;
+
+  doc.setTextColor(220, 38, 38);
+  doc.text(result.summary.critical + " critique" + (result.summary.critical !== 1 ? "s" : ""), rx, y + 10, { align: "right" });
+  doc.setTextColor(234, 88, 12);
+  doc.text(result.summary.major + " majeur" + (result.summary.major !== 1 ? "s" : ""), rx, y + 17, { align: "right" });
+  doc.setTextColor(180, 140, 20);
+  doc.text(result.summary.minor + " mineur" + (result.summary.minor !== 1 ? "s" : ""), rx, y + 24, { align: "right" });
+
+  y += scoreBoxH + 10;
+
+  // === TITRE SECTION ===
+  doc.setDrawColor(37, 99, 235);
+  doc.setLineWidth(0.8);
+  doc.line(margin, y, margin + 40, y);
+  y += 6;
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(30, 41, 59);
+  doc.text(result.issues.length === 0 ? "Resultat" : "Corrections prioritaires (" + result.issues.length + ")", margin, y);
   y += 8;
 
   if (result.issues.length === 0) {
-    doc.setFontSize(12);
+    doc.setFillColor(240, 253, 244);
+    doc.setDrawColor(187, 247, 208);
+    doc.roundedRect(margin, y, contentW, 16, 2, 2, "FD");
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(22, 163, 74);
-    doc.text("Aucun probleme detecte. Bonne accessibilite !", 14, y);
+    doc.text("Aucun probleme detecte. Bonne accessibilite !", margin + 6, y + 10);
   } else {
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Corrections prioritaires", 14, y);
-    y += 10;
-
     result.issues.forEach((issue, i) => {
-      checkPage(35);
+      checkPage(42);
 
-      const sevLabel = issue.severity === "critical" ? "CRITIQUE" : issue.severity === "major" ? "MAJEUR" : "MINEUR";
-      const sevColor: [number, number, number] =
-        issue.severity === "critical" ? [220, 38, 38] : issue.severity === "major" ? [234, 88, 12] : [202, 138, 4];
+      // Couleurs par severite
+      const isC = issue.severity === "critical";
+      const isM = issue.severity === "major";
+      const barColor: [number, number, number] = isC ? [220, 38, 38] : isM ? [234, 88, 12] : [202, 138, 4];
+      const bgColor: [number, number, number] = isC ? [254, 242, 242] : isM ? [255, 247, 237] : [254, 252, 232];
+      const sevLabel = isC ? "CRITIQUE" : isM ? "MAJEUR" : "MINEUR";
+
+      // Calcul hauteur du bloc
+      const descLines = doc.splitTextToSize("WCAG " + issue.wcag + " — " + issue.description, contentW - 20);
+      const elLines = doc.splitTextToSize(issue.element, contentW - 20);
+      const fixLines = doc.splitTextToSize(issue.fix, contentW - 20);
+      const blockH = 12 + descLines.length * 4 + elLines.length * 4 + fixLines.length * 4 + 14;
+
+      checkPage(blockH + 4);
+
+      // Fond du bloc
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      doc.setDrawColor(230, 230, 230);
+      doc.roundedRect(margin, y, contentW, blockH, 2, 2, "FD");
+
+      // Barre de couleur a gauche
+      doc.setFillColor(barColor[0], barColor[1], barColor[2]);
+      doc.rect(margin, y, 3, blockH, "F");
+
+      // Numero + titre
+      const ix = margin + 8;
+      let iy = y + 7;
 
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(0);
-      doc.text((i + 1) + ". " + issue.criterion, 14, y);
+      doc.setTextColor(30, 41, 59);
+      doc.text((i + 1) + ". " + issue.criterion, ix, iy);
 
-      doc.setFontSize(9);
+      // Badge severite (a droite)
+      doc.setFontSize(7);
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(sevColor[0], sevColor[1], sevColor[2]);
-      const w = doc.getTextWidth((i + 1) + ". " + issue.criterion + " ");
-      doc.text("[" + sevLabel + "]", 14 + w + 2, y);
-      y += 5;
+      const badgeW = doc.getTextWidth(sevLabel) + 6;
+      const badgeX = pw - margin - badgeW - 6;
+      doc.setFillColor(barColor[0], barColor[1], barColor[2]);
+      doc.roundedRect(badgeX, iy - 4.5, badgeW, 6, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.text(sevLabel, badgeX + 3, iy);
 
+      iy += 7;
+
+      // Description
       doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(80);
-      doc.text("WCAG " + issue.wcag + " — " + issue.description, 18, y);
-      y += 5;
+      doc.setTextColor(80, 80, 80);
+      doc.text(descLines, ix, iy);
+      iy += descLines.length * 4 + 2;
 
-      const elLines = doc.splitTextToSize("Element : " + issue.element, pageWidth - 36);
-      doc.text(elLines, 18, y);
-      y += elLines.length * 4;
+      // Element concerne
+      doc.setFontSize(8);
+      doc.setFont("courier", "normal");
+      doc.setTextColor(120, 120, 120);
+      doc.text(elLines, ix, iy);
+      iy += elLines.length * 4 + 2;
 
+      // Correction
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
       doc.setTextColor(22, 101, 52);
-      const fixLines = doc.splitTextToSize("Correction : " + issue.fix, pageWidth - 36);
-      doc.text(fixLines, 18, y);
-      y += fixLines.length * 4 + 6;
+      doc.text(fixLines.map((l: string, li: number) => li === 0 ? "-> " + l : "   " + l), ix, iy);
+
+      y += blockH + 4;
     });
   }
 
+  // === PIED DE PAGE sur chaque page ===
   const pageCount = doc.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     doc.setPage(p);
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(
-      "AccessScan — " + formatDate(result.timestamp) + " — Page " + p + "/" + pageCount,
-      pageWidth / 2,
-      290,
-      { align: "center" }
-    );
+    // Ligne fine
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.3);
+    doc.line(margin, 285, pw - margin, 285);
+    // Texte
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(160);
+    doc.text("AccessScan — " + formatDate(result.timestamp), margin, 290);
+    doc.text("Page " + p + "/" + pageCount, pw - margin, 290, { align: "right" });
   }
 
   doc.save("accessscan-" + new Date().toISOString().slice(0, 10) + ".pdf");
