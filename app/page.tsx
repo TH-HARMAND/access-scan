@@ -5,6 +5,7 @@ import { useState } from "react";
 interface AccessIssue {
   criterion: string;
   wcag: string;
+  rgaa: string;
   severity: "critical" | "major" | "minor";
   description: string;
   element: string;
@@ -161,7 +162,7 @@ async function generatePdf(result: ScanResult) {
       const sevLabel = isC ? "CRITIQUE" : isM ? "MAJEUR" : "MINEUR";
 
       // Calcul hauteur du bloc
-      const descLines = doc.splitTextToSize("WCAG " + issue.wcag + " — " + issue.description, contentW - 20);
+      const descLines = doc.splitTextToSize("WCAG " + issue.wcag + " / RGAA " + issue.rgaa + " — " + issue.description, contentW - 20);
       const elLines = doc.splitTextToSize(issue.element, contentW - 20);
       const fixLines = doc.splitTextToSize(issue.fix, contentW - 20);
       const blockH = 12 + descLines.length * 4 + elLines.length * 4 + fixLines.length * 4 + 14;
@@ -308,6 +309,71 @@ export default function Home() {
         </div>
       </form>
 
+      {!result && !loading && !error && (
+        <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-lg font-bold mb-1">Ce que nous vérifions</h2>
+          <p className="text-gray-400 text-xs mb-4">
+            6 critères basés sur les référentiels WCAG 2.1 (international) et RGAA 4.1 (français)
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex gap-3 p-3 rounded-lg bg-red-50">
+              <span className="text-red-500 text-lg leading-none mt-0.5">●</span>
+              <div>
+                <p className="font-semibold text-sm">Images sans texte alternatif</p>
+                <p className="text-xs text-gray-500">WCAG 1.1.1 · RGAA 1.1</p>
+                <p className="text-xs text-gray-400 mt-0.5">Chaque image doit avoir un attribut alt décrivant son contenu</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-lg bg-red-50">
+              <span className="text-red-500 text-lg leading-none mt-0.5">●</span>
+              <div>
+                <p className="font-semibold text-sm">Labels de formulaires manquants</p>
+                <p className="text-xs text-gray-500">WCAG 1.3.1 · RGAA 11.1</p>
+                <p className="text-xs text-gray-400 mt-0.5">Chaque champ de saisie doit avoir un label associé</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
+              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
+              <div>
+                <p className="font-semibold text-sm">Contraste texte insuffisant</p>
+                <p className="text-xs text-gray-500">WCAG 1.4.3 · RGAA 3.2</p>
+                <p className="text-xs text-gray-400 mt-0.5">Ratio minimum de 4.5:1 entre texte et arrière-plan</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
+              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
+              <div>
+                <p className="font-semibold text-sm">Langue de la page</p>
+                <p className="text-xs text-gray-500">WCAG 3.1.1 · RGAA 8.3</p>
+                <p className="text-xs text-gray-400 mt-0.5">La balise html doit indiquer la langue du contenu</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
+              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
+              <div>
+                <p className="font-semibold text-sm">Titre de page manquant</p>
+                <p className="text-xs text-gray-500">WCAG 2.4.2 · RGAA 8.5</p>
+                <p className="text-xs text-gray-400 mt-0.5">Chaque page doit avoir un titre descriptif et unique</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
+              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
+              <div>
+                <p className="font-semibold text-sm">Liens sans intitulé</p>
+                <p className="text-xs text-gray-500">WCAG 2.4.4 · RGAA 6.1</p>
+                <p className="text-xs text-gray-400 mt-0.5">Chaque lien doit avoir un texte ou une alternative accessible</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-xs text-blue-700">
+              <span className="font-semibold">WCAG</span> (Web Content Accessibility Guidelines) est le standard international d&apos;accessibilité web. 
+              <span className="font-semibold"> RGAA</span> (Référentiel Général d&apos;Amélioration de l&apos;Accessibilité) est sa déclinaison française, obligatoire pour les services publics et bientôt pour les entreprises réalisant plus de 250 M€ de CA.
+            </p>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
           {error}
@@ -376,7 +442,7 @@ export default function Home() {
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <h3 className="font-semibold">{issue.criterion}</h3>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${sev.color} whitespace-nowrap`}>
-                        {sev.label} — WCAG {issue.wcag}
+                        {sev.label} — WCAG {issue.wcag} · RGAA {issue.rgaa}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-1">{issue.description}</p>
