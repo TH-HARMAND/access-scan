@@ -3,9 +3,11 @@ import * as cheerio from "cheerio";
 export interface AccessIssue {
   criterion: string;
   wcag: string;
+  rgaa: string;
   severity: "critical" | "major" | "minor";
   description: string;
   element: string;
+  location: string;
   fix: string;
 }
 
@@ -79,12 +81,49 @@ function contrastRatio(
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+function getLocation($: cheerio.CheerioAPI, el: cheerio.Element): string {
+  const parts: string[] = [];
+
+  // Build a short CSS-like path (max 3 levels)
+  let current: cheerio.Element | null = el;
+  const pathParts: string[] = [];
+  for (let depth = 0; current && depth < 3; depth++) {
+    const tagName = current.tagName?.toLowerCase();
+    if (!tagName || tagName === "html" || tagName === "body" || tagName === "[document]") break;
+    let selector = tagName;
+    const id = $(current).attr("id");
+    const cls = $(current).attr("class");
+    if (id) {
+      selector += "#" + id.split(/\s/)[0].substring(0, 25);
+    } else if (cls) {
+      const firstClass = cls.trim().split(/\s+/)[0].substring(0, 25);
+      if (firstClass && !/^[0-9]/.test(firstClass)) {
+        selector += "." + firstClass;
+      }
+    }
+    pathParts.unshift(selector);
+    current = $(current).parent().get(0) || null;
+  }
+  if (pathParts.length > 0) {
+    parts.push(pathParts.join(" > "));
+  }
+
+  // Get surrounding text context
+  const parentText = $(el).parent().text().trim().replace(/\s+/g, " ");
+  if (parentText && parentText.length > 0) {
+    const snippet = parentText.length > 60 ? parentText.substring(0, 60) + "..." : parentText;
+    parts.push('Contexte : "' + snippet + '"');
+  }
+
+  return parts.join(" — ") || "Position non déterminée";
+}
+
 export function analyzeHtml(html: string, url: string): ScanResult {
   const $ = cheerio.load(html);
   const issues: AccessIssue[] = [];
 
   // CHECK 1: Images sans attribut alt
-  $("img").each((_, el) => {
+  $("img").each((idx, el) => {
     const alt = $(el).attr("alt");
     if (alt === undefined) {
       const src = $(el).attr("src") || "inconnue";
@@ -92,9 +131,11 @@ export function analyzeHtml(html: string, url: string): ScanResult {
       issues.push({
         criterion: "Image sans texte alternatif",
         wcag: "1.1.1",
+        rgaa: "1.1 / 1.2",
         severity: "critical",
         description: "Image sans attribut alt détectée",
         element: '<img src="' + srcShort + '">',
+        location: getLocation($, el),
         fix: 'Ajouter un attribut alt descriptif : alt="Description de l\'image"',
       });
     }
@@ -115,9 +156,11 @@ export function analyzeHtml(html: string, url: string): ScanResult {
           issues.push({
             criterion: "Contraste texte insuffisant",
             wcag: "1.4.3",
+            rgaa: "3.2",
             severity: "major",
-            description: 'Ratio de contraste ' + ratio.toFixed(2) + ':1 (minimum requis : 4.5:1)',
-            element: text ? '"' + text + '"' : "Élément avec style inline",
+            description: `Ratio de contraste ${ratio.toFixed(2)}:1 (minimum requis : 4.5:1)`,
+            element: text ? `"${text}"` : "Élément avec style inline",
+            location: getLocation($, el),
             fix: "Augmenter le contraste entre la couleur du texte et l'arrière-plan",
           });
         }
@@ -134,16 +177,18 @@ export function analyzeHtml(html: string, url: string): ScanResult {
     const ariaLabelledby = $(el).attr("aria-labelledby");
     const title = $(el).attr("title");
     const placeholder = $(el).attr("placeholder");
-    const hasLabel = id ? $('label[for="' + id + '"]').length > 0 : false;
+    const hasLabel = id ? $(`label[for="${id}"]`).length > 0 : false;
     const wrappedInLabel = $(el).closest("label").length > 0;
     if (!hasLabel && !wrappedInLabel && !ariaLabel && !ariaLabelledby && !title) {
       const name = $(el).attr("name") || type;
       issues.push({
         criterion: "Label de formulaire manquant",
         wcag: "1.3.1",
+        rgaa: "11.1",
         severity: "critical",
-        description: 'Champ de formulaire sans label associé' + (placeholder ? ' (placeholder: "' + placeholder + '")' : ''),
-        element: '<' + el.tagName + ' type="' + type + '" name="' + name + '">',
+        description: `Champ de formulaire sans label associé${placeholder ? ` (placeholder: "${placeholder}")` : ""}`,
+        element: `<${el.tagName} type="${type}" name="${name}">`,
+        location: getLocation($, el),
         fix: 'Ajouter un <label for="id"> ou un attribut aria-label',
       });
     }
@@ -155,9 +200,11 @@ export function analyzeHtml(html: string, url: string): ScanResult {
     issues.push({
       criterion: "Langue de la page non définie",
       wcag: "3.1.1",
+      rgaa: "8.3",
       severity: "major",
       description: "L'attribut lang manque sur la balise <html>",
       element: "<html>",
+      location: "Balise racine du document",
       fix: 'Ajouter lang="fr" (ou la langue appropriée) sur la balise <html>',
     });
   }
@@ -168,9 +215,11 @@ export function analyzeHtml(html: string, url: string): ScanResult {
     issues.push({
       criterion: "Titre de page manquant",
       wcag: "2.4.2",
+      rgaa: "8.5",
       severity: "major",
       description: "La balise <title> est absente ou vide",
       element: "<head>",
+      location: "En-tête du document (balise <head>)",
       fix: "Ajouter une balise <title> descriptive dans le <head>",
     });
   }
@@ -188,9 +237,11 @@ export function analyzeHtml(html: string, url: string): ScanResult {
       issues.push({
         criterion: "Lien sans intitulé",
         wcag: "2.4.4",
+        rgaa: "6.1",
         severity: "major",
         description: "Lien sans texte ni alternative accessible",
-        element: '<a href="' + hrefShort + '">',
+        element: `<a href="${hrefShort}">`,
+        location: getLocation($, el),
         fix: "Ajouter un texte visible ou un attribut aria-label au lien",
       });
     }

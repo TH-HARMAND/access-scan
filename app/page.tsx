@@ -9,6 +9,7 @@ interface AccessIssue {
   severity: "critical" | "major" | "minor";
   description: string;
   element: string;
+  location: string;
   fix: string;
 }
 
@@ -163,9 +164,10 @@ async function generatePdf(result: ScanResult) {
 
       // Calcul hauteur du bloc
       const descLines = doc.splitTextToSize("WCAG " + issue.wcag + " / RGAA " + issue.rgaa + " — " + issue.description, contentW - 20);
+      const locLines = doc.splitTextToSize("Localisation : " + issue.location, contentW - 20);
       const elLines = doc.splitTextToSize(issue.element, contentW - 20);
       const fixLines = doc.splitTextToSize(issue.fix, contentW - 20);
-      const blockH = 12 + descLines.length * 4 + elLines.length * 4 + fixLines.length * 4 + 14;
+      const blockH = 12 + descLines.length * 4 + locLines.length * 4 + elLines.length * 4 + fixLines.length * 4 + 18;
 
       checkPage(blockH + 4);
 
@@ -205,6 +207,13 @@ async function generatePdf(result: ScanResult) {
       doc.setTextColor(80, 80, 80);
       doc.text(descLines, ix, iy);
       iy += descLines.length * 4 + 2;
+
+      // Localisation
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(37, 99, 180);
+      doc.text(locLines, ix, iy);
+      iy += locLines.length * 4 + 2;
 
       // Element concerne
       doc.setFontSize(8);
@@ -439,13 +448,19 @@ export default function Home() {
                 const sev = severityLabels[issue.severity];
                 return (
                   <div key={i} className={`border rounded-lg p-4 ${sev.bg}`}>
-                    <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-start justify-between gap-2 mb-1">
                       <h3 className="font-semibold">{issue.criterion}</h3>
                       <span className={`text-xs font-bold px-2 py-1 rounded ${sev.color} whitespace-nowrap`}>
-                        {sev.label} — WCAG {issue.wcag} · RGAA {issue.rgaa}
+                        {sev.label}
                       </span>
                     </div>
+                    <p className="text-xs text-gray-500 mb-2">
+                      WCAG {issue.wcag} · RGAA {issue.rgaa}
+                    </p>
                     <p className="text-sm text-gray-600 mb-1">{issue.description}</p>
+                    <div className="text-xs text-blue-700 bg-blue-50 rounded px-2 py-1.5 mb-2">
+                      <span className="font-semibold">📍 Localisation :</span> {issue.location}
+                    </div>
                     <p className="text-xs text-gray-500 font-mono mb-2 break-all">{issue.element}</p>
                     <p className="text-sm text-green-800 font-medium">→ {issue.fix}</p>
                   </div>

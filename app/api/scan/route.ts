@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     let parsedUrl: URL;
     try {
-      parsedUrl = new URL(url.startsWith("http") ? url : "https://" + url);
+      parsedUrl = new URL(url.startsWith("http") ? url : `https://${url}`);
     } catch {
       return NextResponse.json({ error: "URL invalide" }, { status: 400 });
     }
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       if (!response.ok) {
         return NextResponse.json(
-          { error: "Le site a répondu avec le statut " + response.status },
+          { error: `Le site a répondu avec le statut ${response.status}` },
           { status: 422 }
         );
       }
