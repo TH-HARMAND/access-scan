@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeHtml } from "@/lib/analyzer";
+import { createClient } from "@/lib/supabase-server";
 
 export const maxDuration = 30;
 
@@ -52,6 +53,24 @@ export async function POST(request: NextRequest) {
     }
 
     const result = analyzeHtml(html, parsedUrl.toString());
+
+    // Save scan for logged-in users (best effort, don't block response)
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from("scans").insert({
+          user_id: user.id,
+          url: parsedUrl.toString(),
+          score: result.score,
+          issues_count: result.issuesFound,
+          result: result,
+        });
+      }
+    } catch {
+      // Silent fail - don't break scan for DB issues
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     console.error("Scan error:", error);

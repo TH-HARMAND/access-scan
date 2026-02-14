@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface AccessIssue {
   criterion: string;
@@ -256,6 +257,34 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState("");
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
+  const [credits, setCredits] = useState(0);
+  const [email, setEmail] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/credits")
+      .then((r) => r.json())
+      .then((data) => {
+        setLoggedIn(data.logged_in || false);
+        setCredits(data.credits || 0);
+        setEmail(data.email || "");
+      });
+
+    // Check for payment success in URL
+    if (typeof window !== "undefined" && window.location.search.includes("payment=success")) {
+      setPaymentSuccess(true);
+      // Clean URL
+      window.history.replaceState({}, "", "/");
+      // Refresh credits
+      setTimeout(() => {
+        fetch("/api/credits")
+          .then((r) => r.json())
+          .then((data) => setCredits(data.credits || 0));
+      }, 1000);
+    }
+  }, []);
 
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,12 +313,81 @@ export default function Home() {
     }
   };
 
+  const handlePdf = async () => {
+    if (!result) return;
+    setPdfLoading(true);
+
+    try {
+      const res = await fetch("/api/credits", { method: "POST" });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setPdfLoading(false);
+        return;
+      }
+
+      setCredits(data.credits);
+      await generatePdf(result);
+    } catch {
+      // Silent fail
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { createClient } = await import("@/lib/supabase-browser");
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setLoggedIn(false);
+    setCredits(0);
+    setEmail("");
+  };
+
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold mb-2">
+    <main className="max-w-3xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <Link href="/" className="text-2xl font-bold">
           <span className="text-blue-600">Access</span>Scan
-        </h1>
+        </Link>
+        <div className="flex items-center gap-3 text-sm">
+          {loggedIn === null ? null : loggedIn ? (
+            <>
+              <Link href="/pricing" className="text-blue-600 hover:underline font-medium">
+                {credits} crédit{credits !== 1 ? "s" : ""}
+              </Link>
+              <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+                Mes scans
+              </Link>
+              <button onClick={handleLogout} className="text-gray-400 hover:text-gray-600">
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" className="text-gray-600 hover:text-gray-900">
+                Connexion
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Créer un compte
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Payment success banner */}
+      {paymentSuccess && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-center">
+          Paiement réussi ! Vos crédits ont été ajoutés.
+        </div>
+      )}
+
+      <div className="text-center mb-8">
         <p className="text-gray-500 text-lg">
           Vérifiez l&apos;accessibilité de votre site web en quelques secondes
         </p>
@@ -376,7 +474,7 @@ export default function Home() {
           </div>
           <div className="mt-4 p-3 bg-blue-50 rounded-lg">
             <p className="text-xs text-blue-700">
-              <span className="font-semibold">WCAG</span> (Web Content Accessibility Guidelines) est le standard international d&apos;accessibilité web. 
+              <span className="font-semibold">WCAG</span> (Web Content Accessibility Guidelines) est le standard international d&apos;accessibilité web.
               <span className="font-semibold"> RGAA</span> (Référentiel Général d&apos;Amélioration de l&apos;Accessibilité) est sa déclinaison française, obligatoire pour les services publics et bientôt pour les entreprises réalisant plus de 250 M€ de CA.
             </p>
           </div>
@@ -423,12 +521,30 @@ export default function Home() {
             </p>
           </div>
 
-          <button
-            onClick={() => generatePdf(result)}
-            className="w-full py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-          >
-            Télécharger le rapport PDF
-          </button>
+          {/* PDF Button - conditional on auth + credits */}
+          {!loggedIn ? (
+            <Link
+              href="/auth/signup"
+              className="block w-full py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-center"
+            >
+              Créez un compte pour télécharger le PDF
+            </Link>
+          ) : credits < 1 ? (
+            <Link
+              href="/pricing"
+              className="block w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-center"
+            >
+              Acheter des crédits pour le rapport PDF
+            </Link>
+          ) : (
+            <button
+              onClick={handlePdf}
+              disabled={pdfLoading}
+              className="w-full py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
+            >
+              {pdfLoading ? "Génération..." : `Télécharger le rapport PDF (1 crédit — ${credits} restant${credits !== 1 ? "s" : ""})`}
+            </button>
+          )}
 
           {result.issues.length === 0 ? (
             <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
