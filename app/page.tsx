@@ -591,6 +591,17 @@ export default function Home() {
           </p>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="mt-16 pt-6 border-t border-gray-200 text-center space-y-2">
+        <div className="flex justify-center gap-6 text-xs text-gray-400">
+          <Link href="/mentions-legales" className="hover:text-gray-600">Mentions légales</Link>
+          <Link href="/cgv" className="hover:text-gray-600">CGV</Link>
+          <Link href="/confidentialite" className="hover:text-gray-600">Confidentialité</Link>
+          <a href="mailto:access.scan64@gmail.com" className="hover:text-gray-600">Contact</a>
+        </div>
+        <p className="text-xs text-gray-300">© {new Date().getFullYear()} AccessScan</p>
+      </footer>
     </main>
   );
 }
