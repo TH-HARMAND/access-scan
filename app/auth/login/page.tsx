@@ -74,6 +74,11 @@ export default function Login() {
             required
             minLength={6}
           />
+          <div className="text-right mt-1">
+            <Link href="/auth/reset-password" className="text-xs text-blue-600 hover:underline">
+              Mot de passe oublié ?
+            </Link>
+          </div>
         </div>
 
         <button
