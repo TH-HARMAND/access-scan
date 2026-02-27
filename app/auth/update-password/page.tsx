@@ -10,7 +10,7 @@ export default function UpdatePassword() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [hasSession, setHasSession] = useState(false);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
@@ -18,13 +18,39 @@ export default function UpdatePassword() {
   useEffect(() => {
     const supabase = createClient();
 
-    // Verify we have a valid session (set by callback)
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setHasSession(true);
+    // Listen for PASSWORD_RECOVERY event (fired after code exchange)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setReady(true);
+        setChecking(false);
       }
-      setChecking(false);
     });
+
+    // Handle the code in URL (PKCE flow) — Supabase adds ?code=... to redirectTo
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
+        if (exchangeError) {
+          // Code invalid or expired
+          setChecking(false);
+        }
+        // If success, onAuthStateChange will fire PASSWORD_RECOVERY
+        // Clean URL
+        window.history.replaceState({}, "", "/auth/update-password");
+      });
+    } else {
+      // No code — check if user already has a session (e.g. page refresh)
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user) {
+          setReady(true);
+        }
+        setChecking(false);
+      });
+    }
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -49,7 +75,7 @@ export default function UpdatePassword() {
     });
 
     if (updateError) {
-      setError("Erreur lors de la mise à jour. Demandez un nouveau lien de réinitialisation.");
+      setError("Erreur lors de la mise à jour. Demandez un nouveau lien.");
       setLoading(false);
       return;
     }
@@ -65,11 +91,12 @@ export default function UpdatePassword() {
     return (
       <main className="max-w-md mx-auto px-4 py-16 text-center">
         <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <p className="text-gray-500 text-sm mt-4">Vérification du lien...</p>
       </main>
     );
   }
 
-  if (!hasSession) {
+  if (!ready) {
     return (
       <main className="max-w-md mx-auto px-4 py-16">
         <div className="text-center mb-8">
