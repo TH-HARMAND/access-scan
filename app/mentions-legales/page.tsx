@@ -16,7 +16,7 @@ export default function MentionsLegales() {
             Le site AccessScan est édité par :<br />
             Entreprise individuelle<br />
             SIRET : 100 200 930 000 12<br />
-            Email : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>
+            Email : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>
           </p>
           <p>Directeur de la publication : le représentant légal de l&apos;entreprise.</p>
         </section>
@@ -65,7 +65,7 @@ export default function MentionsLegales() {
         <section>
           <h2 className="text-lg font-bold text-gray-900 mb-2">Contact</h2>
           <p>
-            Pour toute question relative au site, vous pouvez nous contacter à l&apos;adresse : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>
+            Pour toute question relative au site, vous pouvez nous contacter à l&apos;adresse : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>
           </p>
         </section>
       </div>

@@ -158,7 +158,7 @@ export default function Pricing() {
           <Link href="/mentions-legales" className="hover:text-gray-600">Mentions légales</Link>
           <Link href="/cgv" className="hover:text-gray-600">CGV</Link>
           <Link href="/confidentialite" className="hover:text-gray-600">Confidentialité</Link>
-          <a href="mailto:access.scan64@gmail.com" className="hover:text-gray-600">Contact</a>
+          <a href="mailto:contact@accessibilite-pme.fr" className="hover:text-gray-600">Contact</a>
         </div>
       </footer>
     </main>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,9 +9,23 @@ export default function UpdatePassword() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [hasSession, setHasSession] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    // Verify we have a valid session (set by callback)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setHasSession(true);
+      }
+      setChecking(false);
+    });
+  }, []);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +33,11 @@ export default function UpdatePassword() {
 
     if (password !== confirm) {
       setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères.");
       return;
     }
 
@@ -30,7 +49,7 @@ export default function UpdatePassword() {
     });
 
     if (updateError) {
-      setError("Erreur lors de la mise à jour. Le lien a peut-être expiré.");
+      setError("Erreur lors de la mise à jour. Demandez un nouveau lien de réinitialisation.");
       setLoading(false);
       return;
     }
@@ -41,6 +60,38 @@ export default function UpdatePassword() {
       router.refresh();
     }, 2000);
   };
+
+  if (checking) {
+    return (
+      <main className="max-w-md mx-auto px-4 py-16 text-center">
+        <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  if (!hasSession) {
+    return (
+      <main className="max-w-md mx-auto px-4 py-16">
+        <div className="text-center mb-8">
+          <Link href="/" className="text-2xl font-bold">
+            <span className="text-blue-600">Access</span>Scan
+          </Link>
+        </div>
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 text-center">
+          <p className="text-orange-700 text-lg font-medium mb-2">Lien expiré ou invalide</p>
+          <p className="text-orange-600 text-sm">
+            Demandez un nouveau lien de réinitialisation.
+          </p>
+          <Link
+            href="/auth/reset-password"
+            className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          >
+            Nouveau lien
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   if (success) {
     return (

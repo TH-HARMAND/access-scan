@@ -16,7 +16,7 @@ export default function Confidentialite() {
           <p>
             Le responsable du traitement des données personnelles collectées sur AccessScan est :<br />
             Entreprise individuelle — SIRET : 100 200 930 000 12<br />
-            Email : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>
+            Email : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>
           </p>
         </section>
 
@@ -81,7 +81,7 @@ export default function Confidentialite() {
             — <span className="font-semibold">Droit d&apos;opposition</span> : vous opposer au traitement de vos données.
           </p>
           <p>
-            Pour exercer ces droits, contactez-nous à : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>. Nous répondrons dans un délai de 30 jours.
+            Pour exercer ces droits, contactez-nous à : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>. Nous répondrons dans un délai de 30 jours.
           </p>
           <p>
             Vous pouvez également adresser une réclamation à la CNIL : <a href="https://www.cnil.fr" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">www.cnil.fr</a>.
@@ -108,7 +108,7 @@ export default function Confidentialite() {
         <section>
           <h2 className="text-lg font-bold text-gray-900 mb-2">10. Contact</h2>
           <p>
-            Pour toute question relative à cette politique : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>
+            Pour toute question relative à cette politique : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>
           </p>
         </section>
       </div>

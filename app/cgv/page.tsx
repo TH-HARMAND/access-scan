@@ -67,7 +67,7 @@ export default function CGV() {
             En achetant des crédits et en les utilisant pour générer un rapport PDF, le Client reconnaît que l&apos;exécution du service commence immédiatement et renonce expressément à son droit de rétractation pour les crédits utilisés.
           </p>
           <p>
-            Pour les crédits non utilisés, le Client peut demander un remboursement dans un délai de 14 jours suivant l&apos;achat en contactant : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>.
+            Pour les crédits non utilisés, le Client peut demander un remboursement dans un délai de 14 jours suivant l&apos;achat en contactant : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>.
           </p>
         </section>
 
@@ -98,7 +98,7 @@ export default function CGV() {
         <section>
           <h2 className="text-lg font-bold text-gray-900 mb-2">Article 10 — Contact</h2>
           <p>
-            Pour toute question relative à ces CGV : <a href="mailto:access.scan64@gmail.com" className="text-blue-600 hover:underline">access.scan64@gmail.com</a>
+            Pour toute question relative à ces CGV : <a href="mailto:contact@accessibilite-pme.fr" className="text-blue-600 hover:underline">contact@accessibilite-pme.fr</a>
           </p>
         </section>
       </div>
