@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Mentions légales",
+  description: "Mentions légales du site AccessScan — Audit accessibilité web pour les PME françaises.",
+  alternates: { canonical: "/mentions-legales" },
+};
 
 export default function MentionsLegales() {
   return (

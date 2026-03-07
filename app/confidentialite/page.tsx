@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Politique de confidentialité",
+  description: "Politique de confidentialité d'AccessScan — Protection des données personnelles et utilisation des cookies.",
+  alternates: { canonical: "/confidentialite" },
+};
 
 export default function Confidentialite() {
   return (
