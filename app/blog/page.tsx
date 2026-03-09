@@ -7,6 +7,17 @@ export const metadata: Metadata = {
   title: 'Blog — Accessibilité web pour les PME françaises',
   description: "Articles et guides sur l'accessibilité web, le RGAA et les WCAG pour les PME françaises.",
   alternates: { canonical: `${SITE_URL}/blog` },
+  openGraph: {
+    title: 'Blog — Accessibilité web pour les PME françaises',
+    description: "Articles et guides sur l'accessibilité web, le RGAA et les WCAG pour les PME françaises.",
+    type: 'website',
+    locale: 'fr_FR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog — Accessibilité web pour les PME françaises',
+    description: "Articles et guides sur l'accessibilité web, le RGAA et les WCAG pour les PME françaises.",
+  },
 };
 
 export default function BlogIndex() {

@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Conditions Générales de Vente",
+  description: "Conditions générales de vente du service AccessScan — Crédits et rapports PDF d'audit accessibilité web.",
+  alternates: { canonical: "/cgv" },
+};
 
 export default function CGV() {
   return (
