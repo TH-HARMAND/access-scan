@@ -621,6 +621,8 @@ export default function Home() {
       {/* Footer */}
       <footer className="mt-16 pt-6 border-t border-gray-200 text-center space-y-2">
         <div className="flex justify-center gap-6 text-xs text-gray-400">
+          <Link href="/outil-accessibilite-web" className="hover:text-gray-600">L&apos;outil</Link>
+          <Link href="/scanner-accessibilite-rgaa" className="hover:text-gray-600">Scanner</Link>
           <Link href="/blog" className="hover:text-gray-600">Blog</Link>
           <Link href="/pricing" className="hover:text-gray-600">Tarifs</Link>
           <Link href="/mentions-legales" className="hover:text-gray-600">Mentions légales</Link>
