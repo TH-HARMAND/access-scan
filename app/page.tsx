@@ -593,6 +593,44 @@ export default function Home() {
         </div>
       )}
 
+      {/* SEO Content Section */}
+      <section className="mt-16">
+        <h2 className="text-xl font-bold mb-4">Pourquoi vérifier l&apos;accessibilité de votre site ?</h2>
+        <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
+          <p>
+            Depuis le <strong>28 juin 2025</strong>, la <strong>directive européenne sur l&apos;accessibilité (European Accessibility Act)</strong> impose
+            aux entreprises de plus de 10 salariés ou réalisant plus de 2 millions d&apos;euros de chiffre d&apos;affaires de rendre leurs services
+            numériques accessibles. En France, cette obligation se traduit par la conformité au <strong>RGAA 4.1</strong> (Référentiel Général
+            d&apos;Amélioration de l&apos;Accessibilité), lui-même basé sur les <strong>WCAG 2.1</strong> niveau AA.
+          </p>
+          <p>
+            Pour les <strong>PME françaises</strong>, cela signifie concrètement que votre site web doit respecter 106 critères d&apos;accessibilité
+            couvrant la navigation, les contenus, les formulaires et les médias. Les sanctions en cas de non-conformité peuvent atteindre
+            <strong> 50 000 € par service numérique</strong>, auxquels s&apos;ajoutent 25 000 € pour l&apos;absence de déclaration d&apos;accessibilité.
+            Un <strong>audit d&apos;accessibilité web</strong> est la première étape pour identifier les non-conformités et établir un plan de correction.
+          </p>
+          <p>
+            Au-delà de l&apos;obligation légale, l&apos;<strong>accessibilité web</strong> est un levier de performance : un site accessible améliore
+            l&apos;expérience utilisateur pour tous (navigation mobile, connexions lentes, handicaps temporaires), renforce votre
+            <strong> référencement naturel</strong> (Google valorise les sites conformes aux WCAG), et élargit votre audience à plus de
+            12 millions de personnes en situation de handicap en France.
+          </p>
+          <p>
+            AccessScan vous permet de réaliser un premier <strong>diagnostic d&apos;accessibilité RGAA</strong> gratuit en quelques secondes.
+            L&apos;outil vérifie automatiquement 6 critères parmi les plus impactants des référentiels <strong>WCAG 2.1</strong> et <strong>RGAA 4.1</strong>,
+            et vous fournit un score ainsi que des corrections prioritaires directement exploitables par votre équipe technique.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/scanner-accessibilite-rgaa"
+              className="inline-block px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              Lancer un audit gratuit →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Blog Articles Section */}
       <section className="mt-16">
         <h2 className="text-xl font-bold mb-1">Ressources accessibilité</h2>

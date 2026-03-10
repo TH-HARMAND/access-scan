@@ -109,7 +109,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
         <div className="bg-[#EBF5FB] border-l-4 border-[#2E86C1] rounded-r-lg p-6 my-8">
           <p className="font-semibold text-[#1B4F72] text-lg mb-2">Testez votre site gratuitement</p>
           <p className="text-gray-700 mb-4">AccessScan analyse votre site sur les critères RGAA et localise chaque erreur sur vos pages. Gratuit, en 2 minutes.</p>
-          <Link href="/" className="inline-block bg-[#1B4F72] text-white px-6 py-3 rounded-md hover:bg-[#2E86C1] no-underline font-medium">
+          <Link href="/scanner-accessibilite-rgaa" className="inline-block bg-[#1B4F72] text-white px-6 py-3 rounded-md hover:bg-[#2E86C1] no-underline font-medium">
             Lancer un scan gratuit →
           </Link>
         </div>
@@ -131,7 +131,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
         <div className="bg-[#EBF5FB] border-l-4 border-[#2E86C1] rounded-r-lg p-6 my-8">
           <p className="font-semibold text-[#1B4F72] text-lg mb-2">Première étape : testez votre site</p>
           <p className="text-gray-700 mb-4">Diagnostic instantané basé sur les critères RGAA, avec localisation précise des erreurs. Gratuit, sans engagement.</p>
-          <Link href="/" className="inline-block bg-[#1B4F72] text-white px-6 py-3 rounded-md hover:bg-[#2E86C1] no-underline font-medium">
+          <Link href="/scanner-accessibilite-rgaa" className="inline-block bg-[#1B4F72] text-white px-6 py-3 rounded-md hover:bg-[#2E86C1] no-underline font-medium">
             Tester mon site →
           </Link>
         </div>
