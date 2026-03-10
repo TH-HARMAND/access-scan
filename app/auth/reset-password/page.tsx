@@ -1,19 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [expiredWarning, setExpiredWarning] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
 
-  const handleReset = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (searchParams.get("error") === "expired") {
+      setExpiredWarning(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
+  const handleReset = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (cooldown > 0) return;
     setLoading(true);
     setError("");
+    setExpiredWarning(false);
 
     const supabase = createClient();
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
@@ -21,14 +39,20 @@ export default function ResetPassword() {
     });
 
     if (resetError) {
-      setError("Erreur lors de l'envoi. Vérifiez votre email.");
+      const msg = resetError.message.toLowerCase();
+      if (msg.includes("rate") || msg.includes("security purposes") || msg.includes("limit") || msg.includes("seconds")) {
+        setError("Vous avez déjà demandé un lien récemment. Veuillez patienter quelques minutes avant de réessayer.");
+      } else {
+        setError("Erreur lors de l'envoi. Vérifiez votre adresse email et réessayez.");
+      }
       setLoading(false);
       return;
     }
 
     setSent(true);
     setLoading(false);
-  };
+    setCooldown(60);
+  }, [email, cooldown]);
 
   if (sent) {
     return (
@@ -61,6 +85,13 @@ export default function ResetPassword() {
         <p className="text-gray-500 mt-2">Réinitialiser votre mot de passe</p>
       </div>
 
+      {expiredWarning && (
+        <div className="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-xl text-center">
+          <p className="text-orange-700 font-medium">Votre lien a expiré ou est invalide.</p>
+          <p className="text-orange-600 text-sm mt-1">Demandez-en un nouveau ci-dessous.</p>
+        </div>
+      )}
+
       <form onSubmit={handleReset} className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
@@ -87,10 +118,10 @@ export default function ResetPassword() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || cooldown > 0}
           className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
-          {loading ? "Envoi..." : "Envoyer le lien"}
+          {loading ? "Envoi..." : cooldown > 0 ? `Réessayer dans ${cooldown}s` : "Envoyer le lien"}
         </button>
 
         <p className="text-center text-sm text-gray-500">
@@ -100,5 +131,18 @@ export default function ResetPassword() {
         </p>
       </form>
     </main>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={
+      <main className="max-w-md mx-auto px-4 py-16 text-center">
+        <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <p className="text-gray-500 text-sm mt-4">Chargement...</p>
+      </main>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
