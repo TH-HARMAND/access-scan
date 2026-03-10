@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { articles } from "@/lib/blog-articles";
 
 interface AccessIssue {
   criterion: string;
@@ -592,9 +593,36 @@ export default function Home() {
         </div>
       )}
 
+      {/* Blog Articles Section */}
+      <section className="mt-16">
+        <h2 className="text-xl font-bold mb-1">Ressources accessibilité</h2>
+        <p className="text-gray-400 text-sm mb-4">
+          Guides pratiques pour mettre votre site en conformité RGAA
+        </p>
+        <div className="grid gap-4">
+          {articles.slice(0, 3).map((article) => (
+            <Link
+              key={article.slug}
+              href={`/blog/${article.slug}`}
+              className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50/50 transition-colors"
+            >
+              <h3 className="font-semibold text-sm text-gray-900 mb-1">{article.title}</h3>
+              <p className="text-xs text-gray-500">{article.summary}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 text-center">
+          <Link href="/blog" className="text-sm text-blue-600 hover:underline font-medium">
+            Voir tous les articles →
+          </Link>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="mt-16 pt-6 border-t border-gray-200 text-center space-y-2">
         <div className="flex justify-center gap-6 text-xs text-gray-400">
+          <Link href="/outil-accessibilite-web" className="hover:text-gray-600">L&apos;outil</Link>
+          <Link href="/scanner-accessibilite-rgaa" className="hover:text-gray-600">Scanner</Link>
           <Link href="/blog" className="hover:text-gray-600">Blog</Link>
           <Link href="/pricing" className="hover:text-gray-600">Tarifs</Link>
           <Link href="/mentions-legales" className="hover:text-gray-600">Mentions légales</Link>
