@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, Suspense } from "react";
-import { createClient } from "@/lib/supabase-browser";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -33,18 +32,21 @@ function ResetPasswordContent() {
     setError("");
     setExpiredWarning(false);
 
-    const supabase = createClient();
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback`,
-    });
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-    if (resetError) {
-      const msg = resetError.message.toLowerCase();
-      if (msg.includes("rate") || msg.includes("security purposes") || msg.includes("limit") || msg.includes("seconds")) {
-        setError("Vous avez déjà demandé un lien récemment. Veuillez patienter quelques minutes avant de réessayer.");
-      } else {
-        setError("Erreur lors de l'envoi. Vérifiez votre adresse email et réessayez.");
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Erreur lors de l'envoi. Réessayez plus tard.");
+        setLoading(false);
+        return;
       }
+    } catch {
+      setError("Erreur réseau. Vérifiez votre connexion et réessayez.");
       setLoading(false);
       return;
     }
