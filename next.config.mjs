@@ -1,5 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'accessibilite-pme.fr' }],
+        destination: 'https://www.accessibilite-pme.fr/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
