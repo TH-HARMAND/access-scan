@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next';
 import { articles } from '@/lib/blog-articles';
-
-const SITE_URL = 'https://accessibilite-pme.fr';
+import { SITE_URL } from '@/lib/blog-config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const blogEntries = articles.map((a) => ({
