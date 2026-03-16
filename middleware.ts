@@ -2,6 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Redirect non-www to www (production only)
+  const hostname = request.nextUrl.hostname;
+  if (hostname === "accessibilite-pme.fr") {
+    const url = request.nextUrl.clone();
+    url.hostname = "www.accessibilite-pme.fr";
+    return NextResponse.redirect(url, 301);
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
