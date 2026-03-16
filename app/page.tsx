@@ -372,7 +372,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/auth/signup"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors"
               >
                 Créer un compte
               </Link>
@@ -388,98 +388,91 @@ export default function Home() {
         </div>
       )}
 
-      <div className="text-center mb-8">
-        <p className="text-gray-500 text-lg">
-          Vérifiez l&apos;accessibilité de votre site web en quelques secondes
-        </p>
-        <p className="text-gray-400 text-sm mt-1">
-          Outil d&apos;aide à la démarche — ne constitue pas une certification WCAG
+      <div className="text-center mb-10 pt-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
+          Tester l&apos;accessibilité RGAA de votre site web
+        </h1>
+        <p className="text-gray-500 text-lg max-w-xl mx-auto">
+          Analysez en quelques secondes les principales erreurs d&apos;accessibilité
+          et identifiez les points à corriger.
         </p>
       </div>
 
-      <form onSubmit={handleScan} className="mb-8">
+      <form onSubmit={handleScan} className="mb-4">
         <div className="flex gap-3">
           <input
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://exemple.fr"
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !url.trim()}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg text-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-8 py-3 bg-blue-700 text-white rounded-lg text-lg font-medium hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? "Analyse..." : "Scanner"}
+            {loading ? "Analyse..." : "Scanner mon site"}
           </button>
         </div>
       </form>
+      <div className="text-center mb-10">
+        <Link
+          href="/scanner-accessibilite-rgaa"
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Voir un exemple de rapport
+        </Link>
+      </div>
 
       {!result && !loading && !error && (
-        <div className="mb-8 bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-lg font-bold mb-1">Ce que nous vérifions</h2>
-          <p className="text-gray-400 text-xs mb-4">
-            6 critères basés sur les référentiels WCAG 2.1 (international) et RGAA 4.1 (français)
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="flex gap-3 p-3 rounded-lg bg-red-50">
-              <span className="text-red-500 text-lg leading-none mt-0.5">●</span>
-              <div>
-                <p className="font-semibold text-sm">Images sans texte alternatif</p>
-                <p className="text-xs text-gray-500">WCAG 1.1.1 · RGAA 1.1</p>
-                <p className="text-xs text-gray-400 mt-0.5">Chaque image doit avoir un attribut alt décrivant son contenu</p>
+        <>
+          <div className="mb-10 bg-white rounded-xl border border-gray-200 p-8">
+            <h2 className="text-xl font-bold mb-6">Ce que détecte le scanner</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="p-4 rounded-lg border border-gray-100 bg-gray-50">
+                <p className="text-2xl mb-2">&#x1F3A8;</p>
+                <p className="font-semibold text-sm mb-1">Contraste des couleurs</p>
+                <p className="text-xs text-gray-500">Ratio minimum entre texte et arrière-plan</p>
               </div>
-            </div>
-            <div className="flex gap-3 p-3 rounded-lg bg-red-50">
-              <span className="text-red-500 text-lg leading-none mt-0.5">●</span>
-              <div>
-                <p className="font-semibold text-sm">Labels de formulaires manquants</p>
-                <p className="text-xs text-gray-500">WCAG 1.3.1 · RGAA 11.1</p>
-                <p className="text-xs text-gray-400 mt-0.5">Chaque champ de saisie doit avoir un label associé</p>
+              <div className="p-4 rounded-lg border border-gray-100 bg-gray-50">
+                <p className="text-2xl mb-2">&#x1F4D1;</p>
+                <p className="font-semibold text-sm mb-1">Structure des titres</p>
+                <p className="text-xs text-gray-500">Hiérarchie H1-H6 correcte et cohérente</p>
               </div>
-            </div>
-            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
-              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
-              <div>
-                <p className="font-semibold text-sm">Contraste texte insuffisant</p>
-                <p className="text-xs text-gray-500">WCAG 1.4.3 · RGAA 3.2</p>
-                <p className="text-xs text-gray-400 mt-0.5">Ratio minimum de 4.5:1 entre texte et arrière-plan</p>
+              <div className="p-4 rounded-lg border border-gray-100 bg-gray-50">
+                <p className="text-2xl mb-2">&#x1F5BC;</p>
+                <p className="font-semibold text-sm mb-1">Textes alternatifs</p>
+                <p className="text-xs text-gray-500">Attribut alt sur chaque image</p>
               </div>
-            </div>
-            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
-              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
-              <div>
-                <p className="font-semibold text-sm">Langue de la page</p>
-                <p className="text-xs text-gray-500">WCAG 3.1.1 · RGAA 8.3</p>
-                <p className="text-xs text-gray-400 mt-0.5">La balise html doit indiquer la langue du contenu</p>
+              <div className="p-4 rounded-lg border border-gray-100 bg-gray-50">
+                <p className="text-2xl mb-2">&#x1F4DD;</p>
+                <p className="font-semibold text-sm mb-1">Formulaires</p>
+                <p className="text-xs text-gray-500">Labels associés à chaque champ de saisie</p>
               </div>
-            </div>
-            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
-              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
-              <div>
-                <p className="font-semibold text-sm">Titre de page manquant</p>
-                <p className="text-xs text-gray-500">WCAG 2.4.2 · RGAA 8.5</p>
-                <p className="text-xs text-gray-400 mt-0.5">Chaque page doit avoir un titre descriptif et unique</p>
+              <div className="p-4 rounded-lg border border-gray-100 bg-gray-50">
+                <p className="text-2xl mb-2">&#x2328;</p>
+                <p className="font-semibold text-sm mb-1">Navigation clavier</p>
+                <p className="text-xs text-gray-500">Liens et éléments interactifs accessibles</p>
               </div>
-            </div>
-            <div className="flex gap-3 p-3 rounded-lg bg-orange-50">
-              <span className="text-orange-500 text-lg leading-none mt-0.5">●</span>
-              <div>
-                <p className="font-semibold text-sm">Liens sans intitulé</p>
-                <p className="text-xs text-gray-500">WCAG 2.4.4 · RGAA 6.1</p>
-                <p className="text-xs text-gray-400 mt-0.5">Chaque lien doit avoir un texte ou une alternative accessible</p>
+              <div className="p-4 rounded-lg border border-gray-100 bg-gray-50">
+                <p className="text-2xl mb-2">&#x26A0;</p>
+                <p className="font-semibold text-sm mb-1">Erreurs HTML</p>
+                <p className="text-xs text-gray-500">Langue de page, titre manquant</p>
               </div>
             </div>
           </div>
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-xs text-blue-700">
-              <span className="font-semibold">WCAG</span> (Web Content Accessibility Guidelines) est le standard international d&apos;accessibilité web.
-              <span className="font-semibold"> RGAA</span> (Référentiel Général d&apos;Amélioration de l&apos;Accessibilité) est sa déclinaison française, obligatoire pour les services publics et bientôt pour les entreprises réalisant plus de 250 M€ de CA.
+
+          <div className="mb-10 p-6 bg-blue-50 border border-blue-200 rounded-xl">
+            <h2 className="text-base font-semibold text-blue-900 mb-2">Ce que ce scanner ne remplace pas</h2>
+            <p className="text-sm text-blue-800">
+              Le scanner identifie automatiquement plusieurs critères d&apos;accessibilité,
+              mais un audit RGAA complet nécessite toujours une analyse humaine.
+              Cet outil est un premier pas vers un site web accessible.
             </p>
           </div>
-        </div>
+        </>
       )}
 
       {error && (
@@ -594,45 +587,44 @@ export default function Home() {
       )}
 
       {/* SEO Content Section */}
-      <section className="mt-16">
-        <h2 className="text-xl font-bold mb-4">Pourquoi vérifier l&apos;accessibilité de votre site ?</h2>
+      <section className="mt-20">
+        <h2 className="text-xl font-bold mb-4">Pourquoi faire un test d&apos;accessibilité de votre site web ?</h2>
         <div className="space-y-4 text-sm text-gray-600 leading-relaxed">
           <p>
-            Depuis le <strong>28 juin 2025</strong>, la <strong>directive européenne sur l&apos;accessibilité (European Accessibility Act)</strong> impose
-            aux entreprises de plus de 10 salariés ou réalisant plus de 2 millions d&apos;euros de chiffre d&apos;affaires de rendre leurs services
-            numériques accessibles. En France, cette obligation se traduit par la conformité au <strong>RGAA 4.1</strong> (Référentiel Général
-            d&apos;Amélioration de l&apos;Accessibilité), lui-même basé sur les <strong>WCAG 2.1</strong> niveau AA.
+            Depuis le <strong>28 juin 2025</strong>, la <strong>directive européenne sur l&apos;accessibilité</strong> impose
+            aux entreprises de rendre leurs services numériques accessibles. En France, cela passe par la conformité au <strong>RGAA 4.1</strong>,
+            basé sur les <strong>WCAG 2.1</strong> niveau AA. Un <strong>test d&apos;accessibilité</strong> est la première étape
+            pour savoir où en est votre site.
           </p>
           <p>
-            Pour les <strong>PME françaises</strong>, cela signifie concrètement que votre site web doit respecter 106 critères d&apos;accessibilité
-            couvrant la navigation, les contenus, les formulaires et les médias. Les sanctions en cas de non-conformité peuvent atteindre
-            <strong> 50 000 € par service numérique</strong>, auxquels s&apos;ajoutent 25 000 € pour l&apos;absence de déclaration d&apos;accessibilité.
-            Un <strong>audit d&apos;accessibilité web</strong> est la première étape pour identifier les non-conformités et établir un plan de correction.
+            Pour les <strong>PME</strong>, rendre son <strong>site web accessible</strong> peut sembler complexe.
+            Les sanctions en cas de non-conformité peuvent atteindre <strong>50 000 €</strong>.
+            Un <strong>audit d&apos;accessibilité</strong> rapide permet d&apos;identifier les erreurs prioritaires
+            et d&apos;établir un plan de correction concret.
           </p>
           <p>
-            Au-delà de l&apos;obligation légale, l&apos;<strong>accessibilité web</strong> est un levier de performance : un site accessible améliore
-            l&apos;expérience utilisateur pour tous (navigation mobile, connexions lentes, handicaps temporaires), renforce votre
-            <strong> référencement naturel</strong> (Google valorise les sites conformes aux WCAG), et élargit votre audience à plus de
-            12 millions de personnes en situation de handicap en France.
+            Au-delà de l&apos;obligation légale, un <strong>site web accessible</strong> améliore
+            l&apos;expérience pour tous vos visiteurs et renforce votre <strong>référencement naturel</strong>.
+            Google valorise les sites conformes aux standards d&apos;accessibilité.
           </p>
           <p>
-            AccessScan vous permet de réaliser un premier <strong>diagnostic d&apos;accessibilité RGAA</strong> gratuit en quelques secondes.
-            L&apos;outil vérifie automatiquement 6 critères parmi les plus impactants des référentiels <strong>WCAG 2.1</strong> et <strong>RGAA 4.1</strong>,
-            et vous fournit un score ainsi que des corrections prioritaires directement exploitables par votre équipe technique.
+            AccessScan vous permet de réaliser un <strong>test d&apos;accessibilité site web</strong> gratuit en quelques secondes.
+            L&apos;outil vérifie automatiquement les critères les plus impactants du <strong>RGAA</strong> et vous fournit
+            un rapport clair avec les corrections prioritaires.
           </p>
           <div className="pt-2">
             <Link
               href="/scanner-accessibilite-rgaa"
-              className="inline-block px-6 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="inline-block px-6 py-2.5 bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
             >
-              Lancer un audit gratuit →
+              Lancer un audit gratuit
             </Link>
           </div>
         </div>
       </section>
 
       {/* Blog Articles Section */}
-      <section className="mt-16">
+      <section className="mt-20">
         <h2 className="text-xl font-bold mb-1">Ressources accessibilité</h2>
         <p className="text-gray-400 text-sm mb-4">
           Guides pratiques pour mettre votre site en conformité RGAA
@@ -657,7 +649,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="mt-16 pt-6 border-t border-gray-200 text-center space-y-2">
+      <footer className="mt-20 pt-6 border-t border-gray-200 text-center space-y-2">
         <div className="flex justify-center gap-6 text-xs text-gray-400">
           <Link href="/outil-accessibilite-web" className="hover:text-gray-600">L&apos;outil</Link>
           <Link href="/scanner-accessibilite-rgaa" className="hover:text-gray-600">Scanner</Link>

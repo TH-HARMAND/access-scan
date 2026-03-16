@@ -5,25 +5,25 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/blog-config";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AccessScan — Audit accessibilité web gratuit pour les PME",
+    default: "Test accessibilité RGAA gratuit – Scanner votre site web",
     template: "%s | AccessScan",
   },
   description:
-    "Vérifiez gratuitement l'accessibilité de votre site web en quelques secondes. Diagnostic RGAA et WCAG pour les PME françaises. Identifiez les erreurs et téléchargez un rapport PDF.",
+    "Vérifiez gratuitement l'accessibilité de votre site web selon les principaux critères RGAA. Analyse rapide avec rapport clair des erreurs.",
   openGraph: {
     type: "website",
     locale: "fr_FR",
     siteName: SITE_NAME,
-    title: "AccessScan — Audit accessibilité web gratuit pour les PME",
+    title: "Test accessibilité RGAA gratuit – Scanner votre site web",
     description:
-      "Diagnostic RGAA et WCAG gratuit pour les PME françaises. Scannez votre site, identifiez les erreurs d'accessibilité et téléchargez un rapport PDF professionnel.",
+      "Vérifiez gratuitement l'accessibilité de votre site web selon les principaux critères RGAA. Analyse rapide avec rapport clair des erreurs.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "AccessScan — Audit accessibilité web gratuit",
+    title: "Test accessibilité RGAA gratuit – Scanner votre site web",
     description:
-      "Vérifiez l'accessibilité RGAA de votre site web en quelques secondes. Gratuit pour les PME françaises.",
+      "Vérifiez gratuitement l'accessibilité de votre site web selon les principaux critères RGAA. Analyse rapide avec rapport clair des erreurs.",
   },
   alternates: {
     canonical: "/",
